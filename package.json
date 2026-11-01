@@ -1,0 +1,14 @@
+{
+  "name": "catraca",
+  "private": true,
+  "description": "Monitoramento de frota de ônibus em tempo real — microsserviços orientados a eventos",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint"
+  }
+}
