@@ -10,12 +10,15 @@ import { SAMPLE_ROUTES } from './sample-routes';
  */
 function createFleet(busCount: number): SimulatedBus[] {
   const routeCount = SAMPLE_ROUTES.length;
+  // Em milissegundos, para o seq de um novo início sempre superar o do anterior.
+  const firstSeq = Date.now();
   return Array.from({ length: busCount }, (_, i) => {
     const route = SAMPLE_ROUTES[i % routeCount]!;
     const busesOnRoute = Math.ceil((busCount - (i % routeCount)) / routeCount);
     const indexOnRoute = Math.floor(i / routeCount);
     const busId = `bus-${String(i + 1).padStart(3, '0')}`;
-    return new SimulatedBus(busId, route, (route.lengthM * indexOnRoute) / busesOnRoute);
+    const startDistanceM = (route.lengthM * indexOnRoute) / busesOnRoute;
+    return new SimulatedBus(busId, route, { startDistanceM, firstSeq });
   });
 }
 

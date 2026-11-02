@@ -25,8 +25,14 @@ describe('SimulatedBus', () => {
     expect(bus.read(now).seq).toBe(1);
   });
 
+  it('continua a sequência a partir de firstSeq', () => {
+    const bus = new SimulatedBus('bus-001', route, { firstSeq: 1_762_000_000_000 });
+    expect(bus.read(now).seq).toBe(1_762_000_000_000);
+    expect(bus.read(now).seq).toBe(1_762_000_000_001);
+  });
+
   it('anda na rota conforme a velocidade', () => {
-    const bus = new SimulatedBus('bus-001', route, 0, steady);
+    const bus = new SimulatedBus('bus-001', route, { random: steady });
     const start = bus.read(now).lon;
     bus.advance(12); // 30 km/h por 12 s = 100 m
     const message = bus.read(now);
@@ -35,8 +41,8 @@ describe('SimulatedBus', () => {
   });
 
   it('nunca passa dos limites de velocidade', () => {
-    const speedingUp = new SimulatedBus('bus-001', route, 0, () => 1);
-    const slowingDown = new SimulatedBus('bus-002', route, 0, () => 0);
+    const speedingUp = new SimulatedBus('bus-001', route, { random: () => 1 });
+    const slowingDown = new SimulatedBus('bus-002', route, { random: () => 0 });
     for (let i = 0; i < 100; i++) {
       speedingUp.advance(2);
       slowingDown.advance(2);
