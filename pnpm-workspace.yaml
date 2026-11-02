@@ -12,6 +12,11 @@ catalog:
   "@types/jest": ^30.0.0
   "@types/node": ^24.19.2
   mqtt: ^5.16.1
+  "@nestjs/common": ^12.3.2
+  "@nestjs/core": ^12.3.2
+  "@nestjs/testing": ^12.3.2
+  reflect-metadata: ^0.2.2
+  rxjs: ^7.8.2
 
 # Dependências autorizadas (true) ou não (false) a rodar scripts na instalação.
 # O pnpm bloqueia por padrão, porque um script de instalação roda código arbitrário.

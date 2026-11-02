@@ -10,6 +10,7 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
-    "sim": "pnpm --filter @catraca/simulator... build && pnpm --filter @catraca/simulator start"
+    "sim": "pnpm --filter @catraca/simulator... build && pnpm --filter @catraca/simulator start",
+    "ingestion": "pnpm --filter @catraca/ingestion... build && pnpm --filter @catraca/ingestion start"
   }
 }

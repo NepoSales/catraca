@@ -1,0 +1,29 @@
+{
+  "name": "@catraca/ingestion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Recebe posições dos rastreadores via MQTT, valida e publica no Kafka",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@catraca/contracts": "workspace:*",
+    "@nestjs/common": "catalog:",
+    "@nestjs/core": "catalog:",
+    "mqtt": "catalog:",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "catalog:",
+    "@types/jest": "catalog:",
+    "@types/node": "catalog:",
+    "jest": "catalog:",
+    "ts-jest": "catalog:",
+    "typescript": "catalog:"
+  }
+}
