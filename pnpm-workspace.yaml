@@ -12,6 +12,7 @@ catalog:
   "@types/jest": ^30.0.0
   "@types/node": ^24.19.2
   mqtt: ^5.16.1
+  "@platformatic/kafka": ^2.14.0
   "@nestjs/common": ^12.3.2
   "@nestjs/core": ^12.3.2
   "@nestjs/testing": ^12.3.2

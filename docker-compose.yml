@@ -32,6 +32,18 @@ services:
       timeout: 10s
       retries: 10
 
+  # Roda uma vez quando o Kafka fica saudável, cria os tópicos e sai.
+  # --if-not-exists torna a criação idempotente: subir de novo não dá erro.
+  kafka-init:
+    image: apache/kafka:4.4.0
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./infra/kafka/create-topics.sh:/create-topics.sh:ro
+    entrypoint: ["/bin/bash", "/create-topics.sh"]
+    restart: "no"
+
   mosquitto:
     image: eclipse-mosquitto:2.1.2-alpine
     ports:
