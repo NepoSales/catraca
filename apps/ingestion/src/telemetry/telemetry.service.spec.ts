@@ -55,6 +55,32 @@ describe('TelemetryService', () => {
     ]);
   });
 
+  it('descarta a mesma mensagem recebida duas vezes', async () => {
+    const { service, published } = setup();
+    const bytes = Buffer.from(JSON.stringify(message));
+    await service.handle(TOPIC, bytes);
+    await service.handle(TOPIC, bytes);
+    expect(published).toHaveLength(1);
+  });
+
+  it('deixa passar a reentrega de uma mensagem que falhou ao publicar', async () => {
+    const published: OutgoingMessage[] = [];
+    let kafkaUp = false;
+    const kafka = {
+      publish: async (msg: OutgoingMessage) => {
+        if (!kafkaUp) throw new Error('Kafka fora do ar');
+        published.push(msg);
+      },
+    } as KafkaPublisher;
+    const service = new TelemetryService(kafka);
+    const bytes = Buffer.from(JSON.stringify(message));
+
+    await service.handle(TOPIC, bytes);
+    kafkaUp = true;
+    await service.handle(TOPIC, bytes);
+    expect(published).toHaveLength(1);
+  });
+
   it('não derruba o serviço quando o Kafka falha', async () => {
     const { service } = setup({ failWith: new Error('Kafka fora do ar') });
     await expect(service.handle(TOPIC, Buffer.from(JSON.stringify(message)))).resolves.toBeUndefined();

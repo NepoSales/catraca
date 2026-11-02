@@ -2,18 +2,27 @@ import { KafkaTopics } from '@catraca/contracts';
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { KafkaPublisher } from '../kafka/kafka-publisher.service';
 import { decodeTelemetry, toPositionReported } from './decode';
+import { RecentIds } from './recent-ids';
 
 const REPORT_EVERY_MS = 10_000;
+/**
+ * Reentregas do MQTT acontecem logo depois de uma reconexão, então 1 minuto de memória basta.
+ * 100 mil ids cobrem com folga 1.000 ônibus mandando posição a cada 2 segundos.
+ */
+const DEDUP_TTL_MS = 60_000;
+const DEDUP_MAX_IDS = 100_000;
 
 /**
  * Decide o destino de cada mensagem que chega do MQTT:
- * - válida: vira PositionReported no tópico de posições, com o busId como chave;
+ * - válida e nova: vira PositionReported no tópico de posições, com o busId como chave;
+ * - válida mas repetida (mesmo eventId há pouco tempo): descartada;
  * - inválida: vai intacta para a dead letter, com o motivo nos headers.
  */
 @Injectable()
 export class TelemetryService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(TelemetryService.name);
-  private readonly counts = { accepted: 0, rejected: 0, failed: 0 };
+  private readonly counts = { accepted: 0, duplicated: 0, rejected: 0, failed: 0 };
+  private readonly recentIds = new RecentIds(DEDUP_TTL_MS, DEDUP_MAX_IDS);
   private reportTimer?: NodeJS.Timeout;
 
   constructor(private readonly kafka: KafkaPublisher) {}
@@ -23,11 +32,19 @@ export class TelemetryService implements OnModuleInit, OnModuleDestroy {
       const result = decodeTelemetry(topic, payload);
       if (result.ok) {
         const event = toPositionReported(result.message);
+        if (this.recentIds.has(event.eventId)) {
+          this.counts.duplicated++;
+          this.logger.debug(`Duplicada descartada: ${event.eventId}`);
+          return;
+        }
         await this.kafka.publish({
           topic: KafkaTopics.PositionReported,
           key: event.payload.busId,
           value: JSON.stringify(event),
         });
+        // Só marca como vista depois de publicar: se o Kafka falhar,
+        // uma reentrega da mesma mensagem ainda tem a chance de passar.
+        this.recentIds.add(event.eventId);
         this.counts.accepted++;
         this.logger.debug(`PositionReported ${event.eventId}`);
       } else {
@@ -56,8 +73,10 @@ export class TelemetryService implements OnModuleInit, OnModuleDestroy {
   // Um resumo periódico em vez de uma linha por mensagem, para o log não virar ruído.
   onModuleInit() {
     this.reportTimer = setInterval(() => {
-      const { accepted, rejected, failed } = this.counts;
-      this.logger.log(`Publicadas: ${accepted} | dead letter: ${rejected} | falhas: ${failed}`);
+      const { accepted, duplicated, rejected, failed } = this.counts;
+      this.logger.log(
+        `Publicadas: ${accepted} | duplicadas: ${duplicated} | dead letter: ${rejected} | falhas: ${failed}`,
+      );
     }, REPORT_EVERY_MS);
   }
 
