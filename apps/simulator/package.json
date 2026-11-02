@@ -1,0 +1,24 @@
+{
+  "name": "@catraca/simulator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Simula os rastreadores dos ônibus publicando posições via MQTT (fica fora do sistema)",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@catraca/contracts": "workspace:*",
+    "mqtt": "catalog:"
+  },
+  "devDependencies": {
+    "@types/jest": "catalog:",
+    "@types/node": "catalog:",
+    "jest": "catalog:",
+    "ts-jest": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -10,6 +10,8 @@ catalog:
   jest: ^30.5.2
   ts-jest: ^29.4.15
   "@types/jest": ^30.0.0
+  "@types/node": ^24.19.2
+  mqtt: ^5.16.1
 
 # Dependências autorizadas (true) ou não (false) a rodar scripts na instalação.
 # O pnpm bloqueia por padrão, porque um script de instalação roda código arbitrário.
