@@ -10,6 +10,18 @@ const round = (value: number, decimals: number) => {
   return Math.round(value * factor) / factor;
 };
 
+export interface SimulatedBusOptions {
+  /** Onde o ônibus começa, em metros a partir do início da rota. */
+  startDistanceM?: number;
+  /**
+   * Primeiro número de sequência. Rastreadores reais guardam o contador e continuam
+   * de onde pararam ao religar; se ele voltasse a 0, "bus-001:0" se repetiria e
+   * seria descartado como duplicado. O simulador passa o horário de início para imitar isso.
+   */
+  firstSeq?: number;
+  random?: () => number;
+}
+
 /**
  * Um ônibus fingindo ser o rastreador embarcado.
  *
@@ -17,17 +29,19 @@ const round = (value: number, decimals: number) => {
  * A função `random` é injetável para que os testes sejam previsíveis.
  */
 export class SimulatedBus {
-  private seq = 0;
+  private seq: number;
   private distanceM: number;
   private speedKmh: number;
+  private readonly random: () => number;
 
   constructor(
     readonly busId: string,
     private readonly route: Route,
-    startDistanceM = 0,
-    private readonly random: () => number = Math.random,
+    options: SimulatedBusOptions = {},
   ) {
-    this.distanceM = startDistanceM;
+    this.distanceM = options.startDistanceM ?? 0;
+    this.seq = options.firstSeq ?? 0;
+    this.random = options.random ?? Math.random;
     this.speedKmh = MAX_SPEED_KMH / 2;
   }
 
