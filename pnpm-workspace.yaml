@@ -1,3 +1,18 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# Versões compartilhadas: um pacote declara "typescript": "catalog:"
+# e recebe a versão definida aqui. Uma única fonte de verdade para o monorepo.
+catalog:
+  typescript: ~6.0.3
+  zod: ^4.6.7
+  jest: ^30.5.2
+  ts-jest: ^29.4.15
+  "@types/jest": ^30.0.0
+
+# Dependências autorizadas (true) ou não (false) a rodar scripts na instalação.
+# O pnpm bloqueia por padrão, porque um script de instalação roda código arbitrário.
+allowBuilds:
+  # Vem do Jest (modo watch). Já traz binário pronto; o script só compila um fallback.
+  '@parcel/watcher': false

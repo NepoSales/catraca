@@ -1,0 +1,25 @@
+{
+  "name": "@catraca/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Contratos de mensagens (MQTT) e eventos (Kafka) compartilhados entre os serviços",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "jest"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/jest": "catalog:",
+    "jest": "catalog:",
+    "ts-jest": "catalog:",
+    "typescript": "catalog:"
+  }
+}
